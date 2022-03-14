@@ -41,3 +41,43 @@ export const getBestOffer = async (address, programId) => {
 
     return{bid, ask}
 }
+
+export const getExpectedFillPrice = async (address, programId) => {
+    let orderBook
+    if (address) {
+        let bids = [];
+        let asks = [];
+        let marketAddress = address ? new PublicKey(address) : defaultMarketAddress
+        let programAddress = programId ? new PublicKey(programId) : defaultProgramAddress
+        let market = await Market.load(connection, marketAddress, {}, programAddress);
+        let loadBidsData = await market.loadBids(connection);
+        let loadAsksData = await market.loadAsks(connection);
+        
+        bids = loadBidsData.getL2(10).map(([price, size]) => [price, size]);
+        asks = loadAsksData.getL2(10).map(([price, size]) => [price, size]);
+
+        orderBook = {bids, asks};
+    }
+
+
+
+    let spentCost = 0;
+    let avgPrice = 0;
+    let cost = 20; //remove this cost
+    let price, sizeAtLevel, costAtLevel
+
+    if (orderBook) {    
+        for ([price, sizeAtLevel] of orderBook.bids) {
+            costAtLevel = (orderBook ? 1 : price) * sizeAtLevel;
+            if (spentCost + costAtLevel > cost) {
+                avgPrice += (cost - spentCost) * price;
+                spentCost = cost;
+                break;
+            }
+            avgPrice += costAtLevel * price;
+            spentCost += costAtLevel;
+        }
+        const totalAvgPrice = avgPrice / Math.min(cost, spentCost);
+        console.log("here: ", totalAvgPrice)
+    }
+}

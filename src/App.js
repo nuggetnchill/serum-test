@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 
 import { SelectMarketDropdown } from './components/SelectMarketDropdown.js';
 
-import { getMarketData, getBestOffer } from './utils/markets';
+import { getMarketData, getBestOffer, getExpectedFillPrice } from './utils/markets';
 
 import { InputNumber, Spin } from 'antd';
 
@@ -31,7 +31,7 @@ function App() {
     setLoading(true);
     let data = await getBestOffer(selectedMarket[1], selectedMarket[2]);
     await setBuySell(data);
-    setLoading(false);
+    setLoading(false);    
   };
 
   const currencyFormat = (num) => {
@@ -47,6 +47,8 @@ function App() {
     //   let data = await getBestOffer(selectedMarket[1], selectedMarket[2])
     //   await setBuySell(data)
     // },10000);
+    getExpectedFillPrice(selectedMarket[1], selectedMarket[2])
+
   }, [selectedMarket]);
 
   return (
