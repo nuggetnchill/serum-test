@@ -6,6 +6,9 @@ import { SelectMarketDropdown } from './components/SelectMarketDropdown.js';
 
 import { getMarketData, getBestOffer } from './utils/markets';
 
+import { InputNumber, Spin } from 'antd';
+
+
 function App() {
   let [loading, setLoading] = useState(false);
   let [selectedMarket, setSelectedMarket] = useState([]);
@@ -40,23 +43,30 @@ function App() {
   useEffect(() => {
     // getBidsAsks()
     getBuySell();
-    const interval = setInterval(async () => {
-      let data = await getBestOffer(selectedMarket[1], selectedMarket[2])
-      await setBuySell(data)
-    },10000);
+    // const interval = setInterval(async () => {
+    //   let data = await getBestOffer(selectedMarket[1], selectedMarket[2])
+    //   await setBuySell(data)
+    // },10000);
   }, [selectedMarket]);
 
   return (
-    <>
+    <div className='App'>
       <SelectMarketDropdown
         onSelectMarket={onSelectMarket}
         selectedMarket={selectedMarket}
       />
       <h2>Trading Pair: {selectedMarket[0]}</h2>
-      {loading && <h3>Loading...</h3>}
+      {loading && <Spin/>}
       {buySell && <h3>Sell: {currencyFormat(buySell.bid)} </h3> }
       {buySell && <h3>Buy: {currencyFormat(buySell.ask)} </h3>}
-    </>
+      <div style={{display:'flex', justifyContent:'center', gap:'1rem'}}>
+      <p>token A </p>
+      <InputNumber style={{width: 100}} placeholder='0' disabled={false} onChange={(e)=>{console.log(e)}}/>
+      <p>token B </p>
+      <InputNumber style={{width: 100}} placeholder='0' />
+
+      </div>
+    </div>
   );
 }
 
