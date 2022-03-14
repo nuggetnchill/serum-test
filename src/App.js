@@ -12,31 +12,36 @@ import { InputNumber, Spin } from 'antd';
 function App() {
   let [loading, setLoading] = useState(false);
   let [selectedMarket, setSelectedMarket] = useState([]);
+  let [fromToken, setFromToken] = useState();
+  let [toToken, setToToken] = useState();
   let [bids, setBids] = useState([]);
   let [asks, setAsks] = useState([]);
   let [buySell, setBuySell] = useState({});
 
   const onSelectMarket = (e) => {
     setSelectedMarket(e);
+    let tradingPair = e[0].split('/');
+    setFromToken(tradingPair[0]);
+    setToToken(tradingPair[1]);
   };
 
   const getBidsAsks = async () => {
     let data = await getMarketData(selectedMarket[1], selectedMarket[2]);
-    await setBids(data.bids);
-    await setAsks(data.asks);
+    setBids(data.bids);
+    setAsks(data.asks);
     console.log( bids, asks)
   };
 
   const getBuySell = async () => {
     setLoading(true);
     let data = await getBestOffer(selectedMarket[1], selectedMarket[2]);
-    await setBuySell(data);
+    setBuySell(data);
     setLoading(false);    
   };
 
   const currencyFormat = (num) => {
     if (num) {
-      return '$' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+      return num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') + " " + toToken;
     }
   };
 
@@ -57,10 +62,10 @@ function App() {
         onSelectMarket={onSelectMarket}
         selectedMarket={selectedMarket}
       />
-      <h2>Trading Pair: {selectedMarket[0]}</h2>
+      <p>Trading Pair: {selectedMarket[0]}</p>
       {loading && <Spin/>}
-      {buySell && <h3>Sell: {currencyFormat(buySell.bid)} </h3> }
-      {buySell && <h3>Buy: {currencyFormat(buySell.ask)} </h3>}
+      {buySell && <h3>Buy {fromToken} for {currencyFormat(buySell.ask)} </h3>}
+      {buySell && <h3>Sell {fromToken} for {currencyFormat(buySell.bid)} </h3> }
       <div style={{display:'flex', justifyContent:'center', gap:'1rem'}}>
       <p>token A </p>
       <InputNumber style={{width: 100}} placeholder='0' disabled={false} onChange={(e)=>{console.log(e)}}/>

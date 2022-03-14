@@ -43,6 +43,7 @@ export const getBestOffer = async (address, programId) => {
 }
 
 export const getExpectedFillPrice = async (address, programId) => {
+    //currently just for bids which is Buy
     let orderBook
     if (address) {
         let bids = [];
