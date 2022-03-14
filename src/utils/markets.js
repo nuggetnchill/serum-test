@@ -53,17 +53,15 @@ export const getExpectedFillPrice = async (address, programId) => {
         let loadBidsData = await market.loadBids(connection);
         let loadAsksData = await market.loadAsks(connection);
         
-        bids = loadBidsData.getL2(10).map(([price, size]) => [price, size]);
-        asks = loadAsksData.getL2(10).map(([price, size]) => [price, size]);
+        bids = loadBidsData.getL2(100).map(([price, size]) => [price, size]);
+        asks = loadAsksData.getL2(100).map(([price, size]) => [price, size]);
 
         orderBook = {bids, asks};
     }
 
-
-
     let spentCost = 0;
     let avgPrice = 0;
-    let cost = 20; //remove this cost
+    let cost = 1000; // quantity of the fromToken to spend 
     let price, sizeAtLevel, costAtLevel
 
     if (orderBook) {    
@@ -79,5 +77,6 @@ export const getExpectedFillPrice = async (address, programId) => {
         }
         const totalAvgPrice = avgPrice / Math.min(cost, spentCost);
         console.log("here: ", totalAvgPrice)
+        return totalAvgPrice;
     }
 }
