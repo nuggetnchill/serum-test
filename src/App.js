@@ -21,6 +21,7 @@ function App() {
     let data = await getMarketData(selectedMarket[1], selectedMarket[2]);
     await setBids(data.bids);
     await setAsks(data.asks);
+    console.log( bids, asks)
   };
 
   const getBuySell = async () => {
@@ -39,10 +40,10 @@ function App() {
   useEffect(() => {
     // getBidsAsks()
     getBuySell();
-    // const interval = setInterval(async () => {
-    //   let data = await getBestOffer(selectedMarket[1], selectedMarket[2])
-    //   await setBuySell(data)
-    // },10000);
+    const interval = setInterval(async () => {
+      let data = await getBestOffer(selectedMarket[1], selectedMarket[2])
+      await setBuySell(data)
+    },10000);
   }, [selectedMarket]);
 
   return (
@@ -53,8 +54,8 @@ function App() {
       />
       <h2>Trading Pair: {selectedMarket[0]}</h2>
       {loading && <h3>Loading...</h3>}
-      <h3>Sell: {currencyFormat(buySell.bid)} </h3>
-      <h3>Buy: {currencyFormat(buySell.ask)} </h3>
+      {buySell && <h3>Sell: {currencyFormat(buySell.bid)} </h3> }
+      {buySell && <h3>Buy: {currencyFormat(buySell.ask)} </h3>}
     </>
   );
 }

@@ -25,31 +25,19 @@ export const getMarketData = async (address, programId) => {
         let loadBidsData = await market.loadBids(connection);
         let loadAsksData = await market.loadAsks(connection);
         for (let [price, size] of loadBidsData.getL2(10)) {
-            bids.push([price, size])
+            bids.push({price, size})
             }
         for (let [price, size] of loadAsksData.getL2(10)) {
-            asks.push([price, size])
+            asks.push({price, size})
             }
         }
     return {bids, asks}
 }
 
 export const getBestOffer = async (address, programId) => {
-    let bid;
-    let ask;
-    if (address) {
-        let marketAddress = address ? new PublicKey(address) : defaultMarketAddress
-        let programAddress = programId ? new PublicKey(programId) : defaultProgramAddress
-        let market = await Market.load(connection, marketAddress, {}, programAddress);
-    
-        let loadBidsData = await market.loadBids(connection);
-        let loadAsksData = await market.loadAsks(connection);
-        for (let [price, size] of loadBidsData.getL2(1)) {
-            bid = price;
-            }
-        for (let [price, size] of loadAsksData.getL2(1)) {
-            ask = price
-            }
-        }
+    let data = await getMarketData(address, programId);
+    let bid = data.bids[0] && data.bids[0].price;
+    let ask = data.asks[0] && data.asks[0].price;
+
     return{bid, ask}
 }
