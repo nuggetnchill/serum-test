@@ -42,7 +42,7 @@ export const getBestOffer = async (address, programId) => {
     return{bid, ask}
 }
 
-export const getExpectedFillPrice = async (address, programId) => {
+export const getExpectedFillPrice = async (address, programId, cost) => {
     //currently just for bids which is Buy
     let orderBook
     if (address) {
@@ -62,7 +62,6 @@ export const getExpectedFillPrice = async (address, programId) => {
 
     let spentCost = 0;
     let avgPrice = 0;
-    let cost = 1000; // quantity of the fromToken to spend 
     let price, sizeAtLevel, costAtLevel
 
     if (orderBook) {    
@@ -78,6 +77,8 @@ export const getExpectedFillPrice = async (address, programId) => {
         }
         const totalAvgPrice = avgPrice / Math.min(cost, spentCost);
         console.log("here: ", totalAvgPrice)
+        console.log("cost here: ", cost*totalAvgPrice)
+
         return totalAvgPrice;
     }
 }

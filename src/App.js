@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
 
@@ -16,7 +16,10 @@ function App() {
   let [toToken, setToToken] = useState();
   let [bids, setBids] = useState([]);
   let [asks, setAsks] = useState([]);
-  let [buySell, setBuySell] = useState({});
+  let [buySell, setBuySell] = useState();
+  let [test, setTest] = useState(0);
+  let inputA = useRef();
+  let inputB = useRef();
 
   const onSelectMarket = (e) => {
     setSelectedMarket(e);
@@ -29,7 +32,7 @@ function App() {
     let data = await getMarketData(selectedMarket[1], selectedMarket[2]);
     setBids(data.bids);
     setAsks(data.asks);
-    console.log( bids, asks)
+    console.log("getBidsAks() running" ,bids, asks)
   };
 
   const getBuySell = async () => {
@@ -45,6 +48,14 @@ function App() {
     }
   };
 
+  const onInputChange = async (e) => {
+    let avgPrice = await getExpectedFillPrice(selectedMarket[1], selectedMarket[2], e)
+    inputB.current.disabled = true;
+
+    setTest(avgPrice * e)
+
+  }
+
   useEffect(() => {
     // getBidsAsks()
     getBuySell();
@@ -52,7 +63,6 @@ function App() {
     //   let data = await getBestOffer(selectedMarket[1], selectedMarket[2])
     //   await setBuySell(data)
     // },10000);
-    getExpectedFillPrice(selectedMarket[1], selectedMarket[2])
 
   }, [selectedMarket]);
 
@@ -64,13 +74,13 @@ function App() {
       />
       <p>Trading Pair: {selectedMarket[0]}</p>
       {loading && <Spin/>}
-      {buySell && <h3>Buy {fromToken} for {currencyFormat(buySell.ask)} </h3>}
-      {buySell && <h3>Sell {fromToken} for {currencyFormat(buySell.bid)} </h3> }
+      {selectedMarket.length > 0 && <h3>Buy {fromToken} for {currencyFormat(buySell.ask)} </h3>}
+      {selectedMarket.length > 0 && <h3>Sell {fromToken} for {currencyFormat(buySell.bid)} </h3> }
       <div style={{display:'flex', justifyContent:'center', gap:'1rem'}}>
-      <p>token A </p>
-      <InputNumber style={{width: 100}} placeholder='0' disabled={false} onChange={(e)=>{console.log(e)}}/>
-      <p>token B </p>
-      <InputNumber style={{width: 100}} placeholder='0' />
+      <p>{fromToken} </p>
+      <InputNumber style={{width: 100}} placeholder='0' disabled={false} min={0} ref={inputA} onChange={(input)=>{onInputChange(input)}}/>
+      <p>{toToken}</p>
+      <InputNumber style={{width: 100}} placeholder='0' disabled={false} min={0} ref={inputB} value={test} />
 
       </div>
     </div>
